@@ -9,7 +9,7 @@ services:
       - key: PYTHON_VERSION
         value: 3.12.0
 
-  - type: static_site
+  - type: static
     name: ivap-frontend
     rootDir: frontend
     buildCommand: npm install && npm run build
