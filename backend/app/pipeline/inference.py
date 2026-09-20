@@ -17,8 +17,8 @@ except ImportError:
 ZONE_POLYGON = np.array([[100, 200], [540, 200], [600, 350], [40, 350]], np.int32)
 
 async def process_video_stream(websocket: WebSocket):
-    project_root = Path(__file__).resolve().parents[3]
-    video_path = str(project_root / "test_vid" / "sample.mp4")
+    backend_root = Path(__file__).resolve().parents[2]
+    video_path = str(backend_root / "test_vid" / "sample.mp4")
     
     # Try video file, fallback to webcam if missing
     if not os.path.exists(video_path):
