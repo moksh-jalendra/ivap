@@ -3,6 +3,7 @@ import asyncio
 import base64
 import numpy as np
 import os
+from pathlib import Path
 from fastapi import WebSocket
 
 try:
@@ -16,7 +17,8 @@ except ImportError:
 ZONE_POLYGON = np.array([[100, 200], [540, 200], [600, 350], [40, 350]], np.int32)
 
 async def process_video_stream(websocket: WebSocket):
-    video_path = "test_vid/sample.mp4"
+    project_root = Path(__file__).resolve().parents[3]
+    video_path = str(project_root / "test_vid" / "sample.mp4")
     
     # Try video file, fallback to webcam if missing
     if not os.path.exists(video_path):

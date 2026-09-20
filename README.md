@@ -30,7 +30,8 @@ backend/
 frontend/
 	src/App.jsx               Live monitoring dashboard
 	src/index.css             Global styling
-render.yaml                 Render configuration for both services
+Dockerfile                  Single-service production container
+render.yaml                 Optional Render configuration for the Docker service
 ```
 
 ## Requirements
@@ -90,40 +91,34 @@ npm run dev
 
 The Vite development server normally runs at `http://localhost:5173`. In development, the frontend connects to `ws://localhost:8000/api/video/stream`.
 
-## Deploy Frontend and Backend on Render
+## Deploy as One Render Web Service
 
-The root `render.yaml` defines both services:
+The current deployment uses one Docker-based web service. The Dockerfile builds the React frontend, installs the Python backend, and runs FastAPI. FastAPI serves both the API and the built frontend from the same URL, including the WebSocket endpoint.
 
-- `ivap-backend`: Python web service running FastAPI and WebSockets.
-- `ivap-frontend`: Render Static Site that builds the React/Vite application.
-
-Deployment steps:
+Manual Render deployment:
 
 1. Push the repository to GitHub.
-2. In Render, choose **New > Blueprint**.
-3. Connect the GitHub repository and select the branch to deploy.
-4. Let Render detect the root `render.yaml` file.
-5. Deploy both services.
+2. In Render, choose **New > Web Service**.
+3. Select the repository and choose the `Docker` runtime.
+4. Set the Dockerfile path to `./Dockerfile` if Render does not detect it automatically.
+5. Set the Docker context to the repository root.
+6. Select the Free plan for prototype testing and deploy.
 
-The frontend uses `VITE_API_URL` to locate the backend. The current Blueprint sets it to:
+The Docker image uses the Render-provided `PORT` value automatically. No frontend service or `VITE_API_URL` setting is required for production because the frontend connects to the same origin. The optional `render.yaml` describes the same Docker service if Blueprint deployment is used later.
 
-```text
-https://ivap-backend.onrender.com
-```
-
-If Render assigns a different backend URL, update `VITE_API_URL` on the frontend service and redeploy it. The frontend connects to the backend WebSocket over `wss://` in production.
+Render's free service can sleep after inactivity, and CPU inference may be slow. The hosted prototype uses the bundled sample video; a cloud service cannot access a developer's local webcam or private CCTV network directly.
 
 Render's free service can sleep after inactivity, and CPU inference may be slow. The hosted prototype uses the bundled sample video; a cloud service cannot access a developer's local webcam or private CCTV network directly.
 
 ## Environment Configuration
 
-The frontend supports this build-time variable:
+For local development, the frontend supports this build-time variable:
 
 ```text
 VITE_API_URL=http://localhost:8000
 ```
 
-For production, set it to the public HTTPS URL of the backend. Do not place camera credentials or other secrets in frontend environment variables.
+In the single-service production deployment it is not needed because the frontend defaults to `window.location.origin`. Do not place camera credentials or other secrets in frontend environment variables.
 
 ## Known Limitations
 
